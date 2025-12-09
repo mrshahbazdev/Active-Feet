@@ -59,12 +59,39 @@ export interface DispatchRecord {
   date: string;
 }
 
+// Employee & Payroll Types
+export interface Employee {
+  id: number;
+  name: string;
+  role: string;
+  contact: string;
+  daily_rate: number;
+  balance?: number; // Calculated: Total Work - Total Paid
+}
+
+export interface WorkLog {
+  id: number;
+  employee_id: number;
+  date: string;
+  description: string;
+  amount: number;
+}
+
+export interface Payment {
+  id: number;
+  employee_id: number;
+  date: string;
+  amount: number;
+  note: string;
+}
+
 export enum AppView {
   DASHBOARD = 'DASHBOARD',
   IMPORT_DATA = 'IMPORT_DATA', 
   PRODUCTION = 'PRODUCTION', 
-  DISPATCH = 'DISPATCH', // New
+  DISPATCH = 'DISPATCH',
   SHOES_MANAGEMENT = 'SHOES_MANAGEMENT',
+  EMPLOYEES = 'EMPLOYEES', // New
   INVENTORY = 'INVENTORY',
   AI_INSIGHTS = 'AI_INSIGHTS',
   SETTINGS = 'SETTINGS'

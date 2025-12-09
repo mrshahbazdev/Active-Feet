@@ -116,6 +116,41 @@ function initDatabase() {
       )
     `);
 
+    // 10. Employees Table
+    db.exec(`
+      CREATE TABLE IF NOT EXISTS employees (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT NOT NULL,
+        role TEXT,
+        contact TEXT,
+        daily_rate REAL DEFAULT 0
+      )
+    `);
+
+    // 11. Work Logs (Attendance/Work Record)
+    db.exec(`
+      CREATE TABLE IF NOT EXISTS work_logs (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        employee_id INTEGER,
+        date TEXT DEFAULT CURRENT_TIMESTAMP,
+        description TEXT,
+        amount REAL,
+        FOREIGN KEY(employee_id) REFERENCES employees(id)
+      )
+    `);
+
+    // 12. Payments (Salaries Given)
+    db.exec(`
+      CREATE TABLE IF NOT EXISTS payments (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        employee_id INTEGER,
+        date TEXT DEFAULT CURRENT_TIMESTAMP,
+        amount REAL,
+        note TEXT,
+        FOREIGN KEY(employee_id) REFERENCES employees(id)
+      )
+    `);
+
     // Seed Admin User
     const adminUser = db.prepare('SELECT * FROM users WHERE username = ?').get('admin');
     if (!adminUser) {
@@ -368,4 +403,56 @@ ipcMain.handle('dispatch:getToday', () => {
     ORDER BY d.date DESC
   `;
   return db.prepare(sql).all();
+});
+
+// --- EMPLOYEES & PAYROLL ---
+
+ipcMain.handle('employees:create', (_, { name, role, contact, dailyRate }) => {
+  try {
+    const stmt = db.prepare('INSERT INTO employees (name, role, contact, daily_rate) VALUES (?, ?, ?, ?)');
+    const info = stmt.run(name, role, contact, dailyRate || 0);
+    return { success: true, id: info.lastInsertRowid };
+  } catch (err) {
+    return { success: false, message: err.message };
+  }
+});
+
+ipcMain.handle('employees:getAll', () => {
+  // Calculate balance = (Total Work Amount) - (Total Payments)
+  const sql = `
+    SELECT e.*, 
+    (SELECT COALESCE(SUM(amount), 0) FROM work_logs WHERE employee_id = e.id) as total_work,
+    (SELECT COALESCE(SUM(amount), 0) FROM payments WHERE employee_id = e.id) as total_paid
+    FROM employees e
+    ORDER BY e.name ASC
+  `;
+  const employees = db.prepare(sql).all();
+  return employees.map(e => ({
+    ...e,
+    balance: (e.total_work || 0) - (e.total_paid || 0)
+  }));
+});
+
+ipcMain.handle('employees:getHistory', (_, employeeId) => {
+  const workLogs = db.prepare('SELECT * FROM work_logs WHERE employee_id = ? ORDER BY date DESC').all(employeeId);
+  const payments = db.prepare('SELECT * FROM payments WHERE employee_id = ? ORDER BY date DESC').all(employeeId);
+  return { workLogs, payments };
+});
+
+ipcMain.handle('work:add', (_, { employeeId, description, amount }) => {
+  try {
+    db.prepare('INSERT INTO work_logs (employee_id, description, amount) VALUES (?, ?, ?)').run(employeeId, description, amount);
+    return { success: true };
+  } catch (err) {
+    return { success: false, message: err.message };
+  }
+});
+
+ipcMain.handle('payments:add', (_, { employeeId, amount, note }) => {
+  try {
+    db.prepare('INSERT INTO payments (employee_id, amount, note) VALUES (?, ?, ?)').run(employeeId, amount, note);
+    return { success: true };
+  } catch (err) {
+    return { success: false, message: err.message };
+  }
 });

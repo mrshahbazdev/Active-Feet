@@ -33,6 +33,17 @@ contextBridge.exposeInMainWorld(
     dispatch: {
       create: (data) => ipcRenderer.invoke('dispatch:create', data),
       getToday: () => ipcRenderer.invoke('dispatch:getToday'),
+    },
+    employees: {
+      create: (data) => ipcRenderer.invoke('employees:create', data),
+      getAll: () => ipcRenderer.invoke('employees:getAll'),
+      getHistory: (id) => ipcRenderer.invoke('employees:getHistory', id),
+    },
+    work: {
+      add: (data) => ipcRenderer.invoke('work:add', data),
+    },
+    payments: {
+      add: (data) => ipcRenderer.invoke('payments:add', data),
     }
   }
 );
