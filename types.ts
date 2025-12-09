@@ -18,9 +18,30 @@ export interface InventoryItem {
   lastUpdated: string;
 }
 
+// Shoes Management Types
+export interface Shoe {
+  id: number;
+  name: string;
+  quantity: number;
+}
+
+export interface Subcategory {
+  id: number;
+  name: string;
+}
+
+export interface SubShoe {
+  id: number;
+  shoes_id: number;
+  subcategory_id: number;
+  quantity: number;
+  subcategory_name: string; // Joined from DB
+}
+
 export enum AppView {
   DASHBOARD = 'DASHBOARD',
   INVENTORY = 'INVENTORY',
+  SHOES_MANAGEMENT = 'SHOES_MANAGEMENT', // New View
   AI_INSIGHTS = 'AI_INSIGHTS',
   SETTINGS = 'SETTINGS'
 }

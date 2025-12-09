@@ -1,28 +1,24 @@
 import { contextBridge, ipcRenderer } from 'electron';
 
-// Expose protected methods that allow the renderer process to use
-// the ipcRenderer without exposing the entire object
 contextBridge.exposeInMainWorld(
   'electron',
   {
     auth: {
       login: (credentials) => ipcRenderer.invoke('auth:login', credentials),
     },
-    // Example: send data to main process
-    send: (channel, data) => {
-      // whitelist channels
-      let validChannels = ["toMain"];
-      if (validChannels.includes(channel)) {
-        ipcRenderer.send(channel, data);
-      }
+    shoes: {
+      getAll: () => ipcRenderer.invoke('shoes:getAll'),
+      add: (name) => ipcRenderer.invoke('shoes:add', name),
+      update: (data) => ipcRenderer.invoke('shoes:update', data),
     },
-    // Example: receive data from main process
-    receive: (channel, func) => {
-      let validChannels = ["fromMain"];
-      if (validChannels.includes(channel)) {
-        // Deliberately strip event as it includes `sender` 
-        ipcRenderer.on(channel, (event, ...args) => func(...args));
-      }
+    subcategories: {
+      getAll: () => ipcRenderer.invoke('subcategories:getAll'),
+    },
+    subshoes: {
+      getByShoeId: (shoeId) => ipcRenderer.invoke('subshoes:getByShoeId', shoeId),
+      add: (data) => ipcRenderer.invoke('subshoes:add', data),
+      update: (data) => ipcRenderer.invoke('subshoes:update', data),
+      delete: (id) => ipcRenderer.invoke('subshoes:delete', id),
     }
   }
 );
