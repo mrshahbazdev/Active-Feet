@@ -5,6 +5,7 @@ import InventoryList from './components/InventoryList';
 import ShoesManagement from './components/ShoesManagement';
 import ImportData from './components/ImportData';
 import Production from './components/Production';
+import Dispatch from './components/Dispatch';
 import AIInsights from './components/AIInsights';
 import Login from './components/Login';
 import { AppView, InventoryItem, User } from './types';
@@ -64,6 +65,8 @@ const App: React.FC = () => {
         return <ImportData />;
       case AppView.PRODUCTION:
         return <Production />;
+      case AppView.DISPATCH:
+        return <Dispatch />;
       case AppView.SHOES_MANAGEMENT:
         return <ShoesManagement />;
       case AppView.INVENTORY:

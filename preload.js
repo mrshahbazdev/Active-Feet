@@ -29,6 +29,10 @@ contextBridge.exposeInMainWorld(
       addShoe: (data) => ipcRenderer.invoke('production:addShoe', data),
       getTodayComponent: () => ipcRenderer.invoke('production:getTodayComponent'),
       getTodayShoe: () => ipcRenderer.invoke('production:getTodayShoe'),
+    },
+    dispatch: {
+      create: (data) => ipcRenderer.invoke('dispatch:create', data),
+      getToday: () => ipcRenderer.invoke('dispatch:getToday'),
     }
   }
 );

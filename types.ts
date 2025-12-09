@@ -49,10 +49,21 @@ export interface ProductionRecord {
   total_quantity: number;
 }
 
+export interface DispatchRecord {
+  id: number;
+  order_id: string;
+  shoe_name: string;
+  customer_name: string;
+  quantity: number;
+  price: number;
+  date: string;
+}
+
 export enum AppView {
   DASHBOARD = 'DASHBOARD',
-  IMPORT_DATA = 'IMPORT_DATA', // New
-  PRODUCTION = 'PRODUCTION', // New
+  IMPORT_DATA = 'IMPORT_DATA', 
+  PRODUCTION = 'PRODUCTION', 
+  DISPATCH = 'DISPATCH', // New
   SHOES_MANAGEMENT = 'SHOES_MANAGEMENT',
   INVENTORY = 'INVENTORY',
   AI_INSIGHTS = 'AI_INSIGHTS',

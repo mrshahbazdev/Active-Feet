@@ -1,5 +1,5 @@
 import React from 'react';
-import { LayoutDashboard, Package, Sparkles, Settings, Box, Footprints, Factory, Import } from 'lucide-react';
+import { LayoutDashboard, Package, Sparkles, Settings, Box, Footprints, Factory, Import, ShoppingCart } from 'lucide-react';
 import { AppView } from '../types';
 
 interface SidebarProps {
@@ -12,6 +12,7 @@ const Sidebar: React.FC<SidebarProps> = ({ currentView, onChangeView }) => {
     { id: AppView.DASHBOARD, label: 'Dashboard', icon: <LayoutDashboard size={20} /> },
     { id: AppView.IMPORT_DATA, label: 'Import Data', icon: <Import size={20} /> },
     { id: AppView.PRODUCTION, label: 'Production', icon: <Factory size={20} /> },
+    { id: AppView.DISPATCH, label: 'Dispatch / Sales', icon: <ShoppingCart size={20} /> },
     { id: AppView.SHOES_MANAGEMENT, label: 'Shoes Management', icon: <Footprints size={20} /> },
     { id: AppView.INVENTORY, label: 'Inventory', icon: <Package size={20} /> },
     { id: AppView.AI_INSIGHTS, label: 'AI Insights', icon: <Sparkles size={20} /> },

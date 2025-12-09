@@ -92,6 +92,30 @@ function initDatabase() {
       )
     `);
 
+    // 8. Orders Table
+    db.exec(`
+      CREATE TABLE IF NOT EXISTS orders (
+        order_id TEXT PRIMARY KEY,
+        customer_name TEXT,
+        status TEXT DEFAULT 'Completed',
+        date TEXT DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+
+    // 9. Today Dispatch (Sales)
+    db.exec(`
+      CREATE TABLE IF NOT EXISTS today_dispatch (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        shoes_id INTEGER,
+        quantity INTEGER,
+        price REAL,
+        date TEXT DEFAULT CURRENT_TIMESTAMP,
+        order_id TEXT,
+        FOREIGN KEY (shoes_id) REFERENCES Shoes (id),
+        FOREIGN KEY (order_id) REFERENCES orders(order_id)
+      )
+    `);
+
     // Seed Admin User
     const adminUser = db.prepare('SELECT * FROM users WHERE username = ?').get('admin');
     if (!adminUser) {
@@ -243,8 +267,6 @@ ipcMain.handle('subshoes:delete', (_, id) => {
   }
 });
 
-// --- NEW HANDLERS FOR PRODUCTION & IMPORT DATA ---
-
 // Import Data (Available Stock)
 ipcMain.handle('stock:getAll', () => {
   const sql = `
@@ -273,11 +295,7 @@ ipcMain.handle('stock:add', (_, { subcategoryId, quantity }) => {
 // Production
 ipcMain.handle('production:addComponent', (_, { subcategoryId, quantity }) => {
   try {
-    // Log production
     db.prepare('INSERT INTO today_production (subcategory_id, quantity) VALUES (?, ?)').run(subcategoryId, quantity);
-    // OPTIONAL: Update available stock (Assuming production ADDS to stock, same as Import Data, or distinct?)
-    // Based on python code, today_production is separate from Available_Stock. 
-    // We will just log it for now.
     return { success: true };
   } catch (err) {
     return { success: false, message: err.message };
@@ -286,9 +304,8 @@ ipcMain.handle('production:addComponent', (_, { subcategoryId, quantity }) => {
 
 ipcMain.handle('production:addShoe', (_, { shoeId, quantity }) => {
   try {
-    // Log shoe production
     db.prepare('INSERT INTO shoes_production (shoe_id, quantity) VALUES (?, ?)').run(shoeId, quantity);
-    // Update Shoe Stock
+    // Update Shoe Stock (Increase)
     db.prepare('UPDATE Shoes SET quantity = quantity + ? WHERE id = ?').run(quantity, shoeId);
     return { success: true };
   } catch (err) {
@@ -314,6 +331,41 @@ ipcMain.handle('production:getTodayShoe', () => {
     JOIN Shoes s ON sp.shoe_id = s.id
     WHERE DATE(sp.timestamp) = DATE('now')
     GROUP BY s.name
+  `;
+  return db.prepare(sql).all();
+});
+
+// Dispatch (Sales)
+ipcMain.handle('dispatch:create', (_, { orderId, customerName, items }) => {
+  // items: [{ shoeId, quantity, price }]
+  const createOrder = db.transaction((orderItems) => {
+    db.prepare('INSERT INTO orders (order_id, customer_name) VALUES (?, ?)').run(orderId, customerName);
+    
+    const insertItem = db.prepare('INSERT INTO today_dispatch (order_id, shoes_id, quantity, price) VALUES (?, ?, ?, ?)');
+    const updateStock = db.prepare('UPDATE Shoes SET quantity = quantity - ? WHERE id = ?');
+    
+    for (const item of orderItems) {
+      insertItem.run(orderId, item.shoeId, item.quantity, item.price);
+      updateStock.run(item.quantity, item.shoeId);
+    }
+  });
+
+  try {
+    createOrder(items);
+    return { success: true };
+  } catch (err) {
+    return { success: false, message: err.message };
+  }
+});
+
+ipcMain.handle('dispatch:getToday', () => {
+  const sql = `
+    SELECT d.id, d.order_id, s.name as shoe_name, d.quantity, d.price, o.customer_name, d.date
+    FROM today_dispatch d
+    JOIN Shoes s ON d.shoes_id = s.id
+    JOIN orders o ON d.order_id = o.order_id
+    WHERE DATE(d.date) = DATE('now')
+    ORDER BY d.date DESC
   `;
   return db.prepare(sql).all();
 });
