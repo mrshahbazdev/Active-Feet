@@ -1,0 +1,60 @@
+{
+  "name": "nexus-inventory-ai",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "main": "main.js",
+  "author": "Nexus AI",
+  "description": "A modern, AI-powered inventory management dashboard.",
+  "scripts": {
+    "web": "vite",
+    "dev": "concurrently -k \"npm run web\" \"wait-on http://localhost:5173 && npm run electron\"",
+    "build": "vite build",
+    "preview": "vite preview",
+    "electron": "electron .",
+    "start": "npm run dev",
+    "dist": "npm run build && electron-builder"
+  },
+  "build": {
+    "appId": "com.nexus.inventory",
+    "productName": "Nexus Inventory AI",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "dist/**/*",
+      "main.js",
+      "preload.js",
+      "package.json"
+    ],
+    "win": {
+      "target": "nsis",
+      "icon": "resources/icon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    }
+  },
+  "dependencies": {
+    "@google/genai": "^1.32.0",
+    "better-sqlite3": "^11.8.1",
+    "bcryptjs": "^2.4.3",
+    "lucide-react": "^0.556.0",
+    "react": "^19.2.1",
+    "react-dom": "^19.2.1",
+    "react-markdown": "^10.1.0",
+    "recharts": "^3.5.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.14.0",
+    "@types/bcryptjs": "^2.4.6",
+    "@vitejs/plugin-react": "^5.0.0",
+    "concurrently": "^9.1.2",
+    "electron": "^39.2.6",
+    "electron-builder": "^25.1.8",
+    "typescript": "~5.8.2",
+    "vite": "^6.2.0",
+    "wait-on": "^8.0.2"
+  }
+}

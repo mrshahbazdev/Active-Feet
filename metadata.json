@@ -1,0 +1,5 @@
+{
+  "name": "Nexus Inventory AI",
+  "description": "A modern, AI-powered inventory management dashboard designed to feel like a native desktop application. Features real-time stock tracking, data visualization, and Gemini-powered insights.",
+  "requestFramePermissions": []
+}
