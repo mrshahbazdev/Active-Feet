@@ -38,10 +38,23 @@ export interface SubShoe {
   subcategory_name: string; // Joined from DB
 }
 
+export interface StockItem {
+  id: number; // subcategory_id
+  name: string;
+  quantity: number;
+}
+
+export interface ProductionRecord {
+  name: string; // shoe_name or subcategory_name
+  total_quantity: number;
+}
+
 export enum AppView {
   DASHBOARD = 'DASHBOARD',
+  IMPORT_DATA = 'IMPORT_DATA', // New
+  PRODUCTION = 'PRODUCTION', // New
+  SHOES_MANAGEMENT = 'SHOES_MANAGEMENT',
   INVENTORY = 'INVENTORY',
-  SHOES_MANAGEMENT = 'SHOES_MANAGEMENT', // New View
   AI_INSIGHTS = 'AI_INSIGHTS',
   SETTINGS = 'SETTINGS'
 }

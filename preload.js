@@ -19,6 +19,16 @@ contextBridge.exposeInMainWorld(
       add: (data) => ipcRenderer.invoke('subshoes:add', data),
       update: (data) => ipcRenderer.invoke('subshoes:update', data),
       delete: (id) => ipcRenderer.invoke('subshoes:delete', id),
+    },
+    stock: {
+      getAll: () => ipcRenderer.invoke('stock:getAll'),
+      add: (data) => ipcRenderer.invoke('stock:add', data),
+    },
+    production: {
+      addComponent: (data) => ipcRenderer.invoke('production:addComponent', data),
+      addShoe: (data) => ipcRenderer.invoke('production:addShoe', data),
+      getTodayComponent: () => ipcRenderer.invoke('production:getTodayComponent'),
+      getTodayShoe: () => ipcRenderer.invoke('production:getTodayShoe'),
     }
   }
 );

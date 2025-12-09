@@ -3,6 +3,8 @@ import Sidebar from './components/Sidebar';
 import Dashboard from './components/Dashboard';
 import InventoryList from './components/InventoryList';
 import ShoesManagement from './components/ShoesManagement';
+import ImportData from './components/ImportData';
+import Production from './components/Production';
 import AIInsights from './components/AIInsights';
 import Login from './components/Login';
 import { AppView, InventoryItem, User } from './types';
@@ -58,6 +60,10 @@ const App: React.FC = () => {
     switch (currentView) {
       case AppView.DASHBOARD:
         return <Dashboard items={items} />;
+      case AppView.IMPORT_DATA:
+        return <ImportData />;
+      case AppView.PRODUCTION:
+        return <Production />;
       case AppView.SHOES_MANAGEMENT:
         return <ShoesManagement />;
       case AppView.INVENTORY:
