@@ -14,7 +14,8 @@
     "electron": "electron .",
     "start": "npm run dev",
     "dist": "npm run build && electron-builder",
-    "rebuild": "electron-builder install-app-deps"
+    "rebuild": "electron-builder install-app-deps",
+    "postinstall": "electron-builder install-app-deps"
   },
   "build": {
     "appId": "com.nexus.inventory",
